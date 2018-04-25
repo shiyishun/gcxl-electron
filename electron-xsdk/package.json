@@ -1,11 +1,11 @@
 {
-  "name": "electron-quick-start",
+  "name": "electron-xsdk",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-     "package": "electron-packager ./  helloworld --platform=win32 --arch=x64 --out=./app  --version 1.0.0 --electron-version=1.8.4  --overwrite"
+     "package": "electron-packager ./  xsdk --platform=win32 --arch=x64 --out=./app  --version 1.0.0 --electron-version=1.8.4  --overwrite"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
