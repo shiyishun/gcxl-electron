@@ -35,9 +35,9 @@
 	  	<div class="container">
 	  	
 		      <div class="form-login" >
-		        <h2 class="form-login-heading">sign in now</h2>
+		        <h2 class="form-login-heading">学生考勤后台管理系统</h2>
 		        <div class="login-wrap">
-		            <input type="text" name="loginName" class="form-control" placeholder="请输入登陆名">
+		            <input type="text" name="loginName" class="form-control" placeholder="请输入用户名或者手机号">
 		            <br>
 		            <input type="password" name="password" class="form-control" placeholder="请输入密码">
 		            <!-- 
@@ -132,15 +132,12 @@
                 dataType: "json",//预期服务器返回的数据类型
                 url: urlBase+"/user_mng/login" ,//url
                 data: 'loginName='+loginName+"&"+"password="+password,
-          xhrFields: {
-        withCredentials: true
-    },
                 success: function (result) {
 				
                     if(result.code==0){
-					     alert(sessionStorage.getItem("token"))
-					     sessionStorage.setItem("token", result.data);
-					  //   $(window).attr('location','index_.html'); 
+					     sessionStorage.setItem("token", result.data);  
+						 sessionStorage.setItem("loginName", loginName);  
+					     $(window).attr('location','index_.html'); 
 					}else{
 					   $("#errmsg").text("*"+result.errmsg);
 					}
