@@ -21,18 +21,19 @@
                   <div class="col-md-12">
                       
                       <div class="content-panel">
-					  <h4 class="mb"><i class="fa fa-angle-right"></i>字典设置</h4>
+					  <h4 class="mb" id='titleShow'><i class="fa fa-angle-right"></i>角色权限</h4>
 					     <div class="form-horizontal style-form" >
                           <div class="form-group">
                                <div class="col-sm-7">
 							      <p id="infomsg" class="col-sm-2 control-label"></p>
                               </div>
                               <div class="col-sm-3">
-                                  <input id='param' type="text" class="form-control"  placeholder="请输入查询的字典名称或字典类别">
+                                  <input id='param' type="text" class="form-control"  placeholder="请输入查询的权限名称">
                               </div>
 							  <div class="col-sm-2">
 							       <button class="btn btn-theme" onclick="search()">查询</button> 
-								   <button class="btn btn-theme" onclick="add()">添加</button> 
+								   <button class="btn btn-theme" onclick="backPage()">返回</button> 
+								 <!-- <button class="btn btn-theme" onclick="add()">添加</button>  --> 
 							  </div>
 
                           </div>
@@ -42,12 +43,12 @@
 	                  	  	  <hr>
                               <thead>
                                 <tr>
-                                  <th width="15%">字典编号</th>
-                                  <th width="15%">字典名称</th>
-                                  <th width="15%">字典值</th>
-                                  <th width="15%">字典类别</th>
-								  <th width="30%">字典描述</th>
-                                  <th width="10%">操作</th>
+								  <th width="15%">权限编号</th>
+                                  <th width="15%">权限名称</th>
+                                  <th width="15%">权限地址</th>
+								  <th width="15%">是否页面</th>
+								  <th width="30%">权限描述</th>
+                                
                               </tr>
                               </thead>
                               <tbody id="list-wrap">
@@ -74,15 +75,23 @@
       	sendAjax(currentPage, pageSize);
       }
 	  
+	  function backPage(){
+
+			   $('#main-content').load('role_auth.html'); 
+            }	
+   
+	  
+	  
 	  function reqestData(page, pageSize, isInit){
 	    
 	      var param = $('#param').val();
+		  var roleId =sessionStorage.getItem("roleId");
 	      $.ajax({
 			 
                 type: "POST",//方法类型
                 dataType: "json",//预期服务器返回的数据类型
-                url: urlBase+"/dict_mng/page" ,//url
-                data: 'param='+param+'&'+'no='+page+'&'+'size='+pageSize,
+                url: urlBase+"/permi/page" ,//url 
+                data: 'param='+param+'&roleId='+ roleId+'&'+'no='+page+'&'+'size='+pageSize,
 				 headers: {
                   token: "" +  sessionStorage.getItem("token")
                  },
@@ -113,6 +122,8 @@
 	  }
 	  
 	  
+
+	  
 	  	  
 	  function search(){
 	      reqestData(1, pageSize, false);
@@ -122,21 +133,18 @@
 	      var list = data.list;
           $("tbody").empty();
 	      for (var i = 0; i < list.length; i++) {  
-		          var dictId = list[i]['dictId'];
-				  var dictNo = list[i]['dictNo'];
-				  
-				  var dictName = list[i]['dictName'];
-				  var dictValue = list[i]["dictValue"]!=null?list[i]["dictValue"]:"";
-				  var dictCategory = list[i]["dictCategory"]!=null?list[i]["dictCategory"]:"";
+		          var permiId = list[i]['permiId'];		
+                  var permiNo = list[i]['permiNo'];					  
+				  var permiName = list[i]['permiName'];
+				  var permiUrl = list[i]['reqUrl'];
+				  var isPage = list[i]['isPage']==0?"是":"否";
 				  var description = list[i]["description"]!=null?list[i]["description"]:"";
-
+                 
 	              var tr = $("<tr></tr>");
 
-                  tr.html('<td>'+dictNo+'</td><td>'+dictName+'</td><td>'+dictValue +'</td>' 
-				  +'<td><span>'+ dictCategory +'</span></td>'
-				  +'<td><span>'+ description +'</span></td>'
-				  +'<td><button onclick="edit(\''+dictId+'\')"title="编辑" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>'
-				  +'<button onclick="del(\''+dictId+'\')" title="删除" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button></td>'
+                  tr.html('<td>'+permiNo +'</td>' +'<td>'+permiName +'</td>' 
+				  +'<td>'+permiUrl+'</td><td>'+isPage +'</td>' 
+				  +'<td>'+ description +'</td>'
 				  );
               
                   $("tbody").append(tr);
@@ -151,45 +159,13 @@
 
 	  
 	  
-	  function add(){
-           sessionStorage.setItem("dictId", ""); 
-	       $('#main-content').load('dict_edit.html'); 
-	  }
-	  
-	  function edit(dictId){
-	       sessionStorage.setItem("dictId", dictId); 
-	       $('#main-content').load('dict_edit.html'); 
-	  
-	  }
-	  
-	  function del(dictId){
-	  
-	    $.confirm({
-                title: '删除',
-                content: '是否删除该记录？',
-                confirm: function(){
-                     $.alert("暂不支持删除");
-                },
-                cancel: function(){
-                 
-                }
-          })
-        }
+
 	  
       $(function(){
 	  
 	      reqestData(1, pageSize, true);
-	  
-          var dictInfomsg = sessionStorage.getItem("dictInfomsg");
-
-		  if(dictInfomsg!=""&&dictInfomsg!=null){
-		      $('#infomsg').text(dictInfomsg); 
-			  sessionStorage.setItem("dictInfomsg", ""); 
-		  }else{
-		  
-		      $('#infomsg').text("");
-		  }
-	  
+	      var roleName =sessionStorage.getItem("roleName");
+          $("#titleShow").text("角色权限->权限查询-"+roleName);
           $('select.styled').customSelect();
       });
 

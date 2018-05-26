@@ -21,18 +21,18 @@
                   <div class="col-md-12">
                       
                       <div class="content-panel">
-					  <h4 class="mb"><i class="fa fa-angle-right"></i>字典设置</h4>
+					  <h4 class="mb"><i class="fa fa-angle-right"></i>角色权限</h4>
 					     <div class="form-horizontal style-form" >
                           <div class="form-group">
                                <div class="col-sm-7">
 							      <p id="infomsg" class="col-sm-2 control-label"></p>
                               </div>
                               <div class="col-sm-3">
-                                  <input id='param' type="text" class="form-control"  placeholder="请输入查询的字典名称或字典类别">
+                                  <input id='param' type="text" class="form-control"  placeholder="请输入查询的角色名称">
                               </div>
 							  <div class="col-sm-2">
 							       <button class="btn btn-theme" onclick="search()">查询</button> 
-								   <button class="btn btn-theme" onclick="add()">添加</button> 
+								 <!-- <button class="btn btn-theme" onclick="add()">添加</button>  --> 
 							  </div>
 
                           </div>
@@ -42,12 +42,10 @@
 	                  	  	  <hr>
                               <thead>
                                 <tr>
-                                  <th width="15%">字典编号</th>
-                                  <th width="15%">字典名称</th>
-                                  <th width="15%">字典值</th>
-                                  <th width="15%">字典类别</th>
+                                  <th width="15%">角色名称</th>
+                                  <th width="15%">创建时间</th>
 								  <th width="30%">字典描述</th>
-                                  <th width="10%">操作</th>
+                                  <th width="10%">查看权限</th>
                               </tr>
                               </thead>
                               <tbody id="list-wrap">
@@ -63,7 +61,7 @@
     
   <script>
       currentPage=1;
-	  pageSize = 10;
+	  pageSize = 5;
 
       function prePage(){
       	currentPage--;
@@ -81,7 +79,7 @@
 			 
                 type: "POST",//方法类型
                 dataType: "json",//预期服务器返回的数据类型
-                url: urlBase+"/dict_mng/page" ,//url
+                url: urlBase+"/role_mng/page" ,//url 
                 data: 'param='+param+'&'+'no='+page+'&'+'size='+pageSize,
 				 headers: {
                   token: "" +  sessionStorage.getItem("token")
@@ -113,6 +111,28 @@
 	  }
 	  
 	  
+	function timeStamp2String(time){
+    var datetime = new Date();
+     datetime.setTime(time);
+     var year = datetime.getFullYear();
+     var month = datetime.getMonth() + 1;
+     var date = datetime.getDate();
+     var hour = datetime.getHours();
+     if(hour<=9){
+         hour="0"+hour;
+     }
+     var minute = datetime.getMinutes();
+      if(minute<=9){
+         minute="0"+minute;
+     }
+     var second = datetime.getSeconds();
+      if(second<=9){
+         second="0"+second;
+     }
+    // var mseconds = datetime.getMilliseconds();
+     return year + "-" + month + "-" + date+" "+hour+":"+minute+":"+second;//+"."+mseconds;
+}; 
+	  
 	  	  
 	  function search(){
 	      reqestData(1, pageSize, false);
@@ -122,21 +142,15 @@
 	      var list = data.list;
           $("tbody").empty();
 	      for (var i = 0; i < list.length; i++) {  
-		          var dictId = list[i]['dictId'];
-				  var dictNo = list[i]['dictNo'];
-				  
-				  var dictName = list[i]['dictName'];
-				  var dictValue = list[i]["dictValue"]!=null?list[i]["dictValue"]:"";
-				  var dictCategory = list[i]["dictCategory"]!=null?list[i]["dictCategory"]:"";
+		          var roleId = list[i]['roleId'];		  
+				  var roleName = list[i]['roleName'];
 				  var description = list[i]["description"]!=null?list[i]["description"]:"";
-
+                  var createTime = list[i]["createTime"]!=null?timeStamp2String(list[i]["createTime"]):"";
 	              var tr = $("<tr></tr>");
 
-                  tr.html('<td>'+dictNo+'</td><td>'+dictName+'</td><td>'+dictValue +'</td>' 
-				  +'<td><span>'+ dictCategory +'</span></td>'
-				  +'<td><span>'+ description +'</span></td>'
-				  +'<td><button onclick="edit(\''+dictId+'\')"title="编辑" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>'
-				  +'<button onclick="del(\''+dictId+'\')" title="删除" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button></td>'
+                  tr.html('<td>'+roleName+'</td><td>'+createTime +'</td>' 
+				  +'<td>'+ description +'</td>'
+				  +'<td><button onclick="look(\''+roleId+'\',\''+roleName+'\')"title="查看" class="btn btn-primary btn-xs"><i class="glyphicon glyphicon-list-alt"></i></button>'
 				  );
               
                   $("tbody").append(tr);
@@ -152,17 +166,18 @@
 	  
 	  
 	  function add(){
-           sessionStorage.setItem("dictId", ""); 
-	       $('#main-content').load('dict_edit.html'); 
+           sessionStorage.setItem("roleId", ""); 
+	       $('#main-content').load(''); 
 	  }
 	  
-	  function edit(dictId){
-	       sessionStorage.setItem("dictId", dictId); 
-	       $('#main-content').load('dict_edit.html'); 
+	  function look(roleId, roleName){
+	       sessionStorage.setItem("roleId", roleId); 
+		   sessionStorage.setItem("roleName", roleName); 
+	       $('#main-content').load('permi_search.html'); 
 	  
 	  }
 	  
-	  function del(dictId){
+	  function del(roleId){
 	  
 	    $.confirm({
                 title: '删除',
@@ -180,11 +195,11 @@
 	  
 	      reqestData(1, pageSize, true);
 	  
-          var dictInfomsg = sessionStorage.getItem("dictInfomsg");
+          var roleInfomsg = sessionStorage.getItem("roleInfomsg");
 
-		  if(dictInfomsg!=""&&dictInfomsg!=null){
-		      $('#infomsg').text(dictInfomsg); 
-			  sessionStorage.setItem("dictInfomsg", ""); 
+		  if(roleInfomsg!=""&&roleInfomsg!=null){
+		      $('#infomsg').text(roleInfomsg); 
+			  sessionStorage.setItem("roleInfomsg", ""); 
 		  }else{
 		  
 		      $('#infomsg').text("");
