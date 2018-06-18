@@ -2,16 +2,12 @@ $.fn.extend({
     paging: function(option) {
         var obj = $(this);
         var defaults = {
-            pageNun: 3, //可视页码数量
+            pageSize: 3, //可视页码数量
             totalPage:10, //数据总页码
-			pageSize: 10, //每页显示条数
-            totalCount: 0 // 总数据条数
         };
         var settings = $.extend(defaults, option || {});  //初始化
         var totalPage = settings.totalPage;
-        var pageNun = settings.pageNun;
-		var pageSize = settings.pageSize;
-		var totalCount = settings.totalCount;
+        var pageSize = settings.pageSize;
         init();
         function light(obj) {    //点击页码高亮样式，当前页码
             obj.addClass("current").siblings().removeClass("current");
@@ -24,7 +20,7 @@ $.fn.extend({
         }
         function resetPage(start){
             var objPage = obj.find("span");
-            for(var i = 2; i < pageNun + 2; i++ ) {
+            for(var i = 2; i < pageSize + 2; i++ ) {
                 $(objPage[i]).text(start++);
             }
         }
@@ -49,16 +45,15 @@ $.fn.extend({
         function makePage(start,isHome,isEnd) {  //生成页码
             var index = 0;
             var html = '';
-            var endPage = start + pageNun-1;
-            if(totalPage <= pageNun) {
+            var endPage = start + pageSize-1;
+            if(totalPage <= pageSize) {
                endPage = totalPage;
             } 
-            html = '<div><span class="home" id="home">首页</span><span id="pre" class="home"><</span>';
+            html = '<span class="home" id="home">首页</span><span id="pre" class="home"><</span>';
             for (var i = start; i <= endPage; i++) {
                 html += '<span class="page" id="uipage-nav'+ i +'">' + i + "</span>";
             }
             html += '<span id="next" class="end">></span><span  class="end" id="end">末页</span>';
-			html += '&nbsp;&nbsp'+ pageSize +'条/页&nbsp;&nbsp;共'+totalCount+'条</div>';
             obj.html(html);
             if(!isHome || start == 1){
                 showHome(false);
@@ -68,25 +63,25 @@ $.fn.extend({
             }
         }
         function refreshPage(start,nextPage){   //刷新页码
-            var end = start + pageNun - 1;
+            var end = start + pageSize - 1;
             if(start <= 1) {
                 start = 1;
                 resetPage(start);
                 showHome(false);
                 showEnd(true);
                 light($("#uipage-nav"+nextPage));
-            }else if(start>1 && start+pageNun < totalPage){
+            }else if(start>1 && start+pageSize < totalPage){
                 resetPage(start);
                 showHome(true);
                 showEnd(true);
-                light($("#uipage-nav"+pageNun));
+                light($("#uipage-nav"+pageSize));
             }else if(end > totalPage) {
-                start = totalPage - pageNun + 1;
+                start = totalPage - pageSize + 1;
                 showEnd(false);
                 showHome(true);
                 resetPage(start);
-                var endPage = parseInt($("#uipage-nav"+pageNun).text()); //末页页数
-                var showPageIndex = pageNun - (endPage - nextPage);
+                var endPage = parseInt($("#uipage-nav"+pageSize).text()); //末页页数
+                var showPageIndex = pageSize - (endPage - nextPage);
                  light($('#uipage-nav'+showPageIndex));
             } else if(end == totalPage){
                 resetPage(start);
@@ -104,7 +99,7 @@ $.fn.extend({
         function init(){   //初始化页码
            if(totalPage <= 1) { 
                 makePage(1,false,false)
-            } else if(totalPage <= pageNun){
+            } else if(totalPage <= pageSize){
                 makePage(1,false,false)
             } else {
                 makePage(1,false,true);  
@@ -122,7 +117,7 @@ $.fn.extend({
             var currentPage = getCurrentPage();
             var showPageIndex = currentIndex + 1;
             var nextPage = currentPage + 1;
-            if(currentIndex == pageNun + 1) {
+            if(currentIndex == pageSize + 1) {
                 refreshPage(currentPage + 1,nextPage);
             } else {
                 light(obj.find("span").eq(showPageIndex));
@@ -135,7 +130,7 @@ $.fn.extend({
             var showPageIndex = currentIndex - 1;
             var nextPage = currentPage - 1;
             if(currentIndex == 2) {
-                refreshPage(currentPage - pageNun,nextPage);
+                refreshPage(currentPage - pageSize,nextPage);
             } else {
                 light(obj.find("span").eq(showPageIndex));
             }
@@ -149,10 +144,10 @@ $.fn.extend({
             sendAjax(1,20);
         });
         obj.find("#end").click(function(){
-            refreshPage(totalPage-pageNun+1);
+            refreshPage(totalPage-pageSize+1);
             showEnd(false);
             showHome(true);
-            light(obj.find("span").eq(pageNun+1));
+            light(obj.find("span").eq(pageSize+1));
             sendAjax(totalPage,20);
         });
     }

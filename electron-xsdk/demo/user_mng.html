@@ -62,8 +62,10 @@
 		</section><! --/wrapper -->
     <!--script for this page-->
   <script>
-  	currentPage=1;
-	pageSize = 5;
+      currentPage=1;
+	  pageSize = 10;
+      totalPage = 0;        
+	  totalCount = 0;
 
 	
       function prePage(){
@@ -132,7 +134,7 @@
 	  
 	  
 	  
-	   function reqestData(page, pageSize, isInit){
+	   function reqestData(page, pageSize, isInit, ifPaging){
 	    
 	      var param = $('#param').val();
 	      $.ajax({
@@ -151,10 +153,12 @@
 				
                     if(result.code==0){
 					     loadData(result.data);
-						 if(isInit==true){
-                           var initTotalPageNum = result.data.totalPage;	
-						   $("#ui-page").paging({pageSize:3,totalPage:initTotalPageNum});
-						  }
+						 if(ifPaging){
+                           totalPage = result.data.totalPage;        
+	                       pageSize = result.data.pageSize;
+						   totalCount = result.data.totalCount;
+                           $("#ui-page").paging({pageNum:3,totalPage:totalPage,pageSize:pageSize,totalCount:totalCount});
+						 }
 					}else{					
 					   $.alert(result.errmsg);
 					}
@@ -171,7 +175,7 @@
 	  
 	  
 	  function search(){
-	      reqestData(1, pageSize, true);
+	      reqestData(1, pageSize, false, true);
 	  }
 	  
 	  function loadData(data){
@@ -202,7 +206,7 @@
 	  
       $(function(){
 	  
-	      reqestData(1, pageSize, true);
+	      reqestData(1, pageSize, true ,true);
 	                            
     
           var userInfomsg = sessionStorage.getItem("userInfomsg");
@@ -224,7 +228,7 @@
   /* ajax 请求更新数据 */
  function sendAjax(page, size){
 
-    reqestData(page, pageSize, false);
+    reqestData(page, pageSize, false, false);
  }
   /* 初始化页面 */
 
