@@ -1,7 +1,7 @@
 //var urlBase = 'http://localhost:8080/xsdk';
 //var urlBase = 'http://www.pandagp.cn:8888/xsdk';
-var urlBase = "http://"+window.location.host+"/xsdk";
-
+//var urlBase = "http://"+window.location.host+"/xsdk";
+var urlBase = 'http://119.29.60.141:8888/xsdk';
 function fmtDate(obj){
     var date =  new Date(obj);
     var y = 1900+date.getYear();
